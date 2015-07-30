@@ -15,9 +15,17 @@ exports.load = function(req, res, next, quizId) {
 
 // GET /quizes
 exports.index = function(req, res) {
-	models.Quiz.findAll().then(
+	var where = {};
+	if(req.query.search){
+		where = {
+			where: ["lower(pregunta) like lower(?)", "%" + req.query.search.replace(" ","%") + "%"],
+			order: ["pregunta"]
+		};
+	}	
+
+	models.Quiz.findAll(where).then(
 		function(quizes) {
-			res.render('quizes/index', { quizes: quizes});
+			res.render('quizes/index', { quizes: quizes, search_param: req.query.search });
 		}
 	).catch(function(error) { next(error);})
 
@@ -31,7 +39,7 @@ exports.show = function(req, res) {
 // GET /quizes/:id/answer
 exports.answer = function(req, res) {
 	var resultado = 'Incorrecto';
-	if (req.query.respuesta === req.quiz.respuesta) {
+	if (req.query.respuesta.toLowerCase() === req.quiz.respuesta.toLowerCase()) {
 		resultado = 'Correcto';
 	}
 	res.render('quizes/answer', {quiz: req.quiz, respuesta: resultado});

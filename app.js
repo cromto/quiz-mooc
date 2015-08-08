@@ -36,7 +36,16 @@ app.use(function(req, res, next) {
   }
   // Hacer visible req.session en las vistas
   res.locals.session = req.session;
-  next();
+
+  var timestamp_actual = (new Date()).getTime();
+  var timestamp_ultima_actividad = req.session.timestamp_ultima_actividad || timestamp_actual;
+  
+  req.session.timestamp_ultima_actividad = timestamp_actual;
+  if (req.session.user && (timestamp_actual - timestamp_ultima_actividad > 5000)) {
+    res.redirect("/logout");
+  }else{
+    next();
+  }  
 });
 
 app.use('/', routes);

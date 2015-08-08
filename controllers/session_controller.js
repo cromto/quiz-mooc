@@ -1,3 +1,13 @@
+Ôªø
+// MW de autorizaci√≥n de accesos HTTP restringidos
+exports.loginRequired = function(req, res, next){
+    if (req.session.user) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+};
+
 // Get /login   -- Formulario de login
 exports.new = function(req, res) {
     var errors = req.session.errors || {};
@@ -15,17 +25,17 @@ exports.create = function(req, res) {
     var userController = require('./user_controller');
     userController.autenticar(login, password, function(error, user) {
 
-        if (error) {  // si hay error retornamos mensajes de error de sesiÛn
+        if (error) {  // si hay error retornamos mensajes de error de sesi√≥n
             req.session.errors = [{"message": 'Se ha producido un error: '+error}];
             res.redirect("/login");        
             return;
         }
 
         // Crear req.session.user y guardar campos id y username
-        // La sesiÛn se define por la existencia de: req.session.user
+        // La sesi√≥n se define por la existencia de: req.session.user
         req.session.user = {id:user.id, username:user.username};
 
-        res.redirect(req.session.redir.toString());// redirecciÛn a path anterior a login
+        res.redirect(req.session.redir.toString());// redirecci√≥n a path anterior a login
     });
 };
 
